@@ -278,7 +278,7 @@ async def _run_pipeline(
 
     # Initialise Pixels
     pixels = Pixels()
-    pixels.listen()
+    pixels.stop()
 
     # The ready_to_stream event fires when local processing is over and we are
     # ready to stream audio to HA.
@@ -317,7 +317,7 @@ async def _run_pipeline(
             if args.done_sound:
                 playback_queue.put_nowait(PlayMedia(args.done_sound))
             # Switch off
-            pixels.listen()
+            pixels.stop()
         elif event_type == "tts-end":
             # Speaking
             pixels.speak()
@@ -326,7 +326,6 @@ async def _run_pipeline(
             if tts_url:
                 url = f"{args.protocol}://{args.host}:{args.port}{tts_url}"
                 playback_queue.put_nowait(PlayMedia(url))
-            pixels.think()
             
         elif event_type in ("run-end", "error"):
             # Start recording for next wake word (after TTS finishes)
