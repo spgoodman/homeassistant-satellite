@@ -1,0 +1,13 @@
+[Unit]
+Description=Home Assistant Satellite
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/home/steve/homeassistant-satellite/script/run --host 10.152.0.2 --noise-suppression 1 --auto-gain 10 --vad silero --mic-device "plughw:CARD=seeed2micvoicec,DEV=0" --snd-device "plughw:CARD=seeed2micvoicec,DEV=0" --token "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJiY2UwMGM3Yzk4ZGI0ZjEwYjQ1Y2Y3ZmYyNGE5YmUzMyIsImlhdCI6MTY5OD>WorkingDirectory=/home/steve/homeassistant-satellite
+Restart=always
+RestartSec=1
+
+[Install]
+WantedBy=default.target
