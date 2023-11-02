@@ -26,7 +26,7 @@ from .snd import (
     play_udp,
 )
 from .state import MicState, State
-
+from .pixels import Pixels
 
 # items of the playback queue
 @dataclass
@@ -272,6 +272,11 @@ async def _run_pipeline(
     if args.vad != VAD_DISABLED:
         _LOGGER.debug("Waiting for speech")
 
+    # Initialise Pixels
+    
+    pixels = Pixels()
+    pixels.off()
+
     # The ready_to_stream event fires when local processing is over and we are
     # ready to stream audio to HA.
     await ready_to_stream.wait()
@@ -294,24 +299,32 @@ async def _run_pipeline(
             if args.ducking_volume is not None:
                 playback_queue.put_nowait(Duck(True))
 
+            # Wakeup Pixels
+            pixels.wakeup()
             if args.awake_sound:
                 state.mic = MicState.NOT_RECORDING
                 playback_queue.put_nowait(PlayMedia(args.awake_sound))
                 playback_queue.put_nowait(SetMicState(MicState.RECORDING))
+
+            
 
         elif event_type == "stt-end":
             # Stop recording until run ends
             state.mic = MicState.NOT_RECORDING
             if args.done_sound:
                 playback_queue.put_nowait(PlayMedia(args.done_sound))
-
+            # Switch off
+            pixels.off()
         elif event_type == "tts-end":
+            # Speaking
+            pixels.speak()
             # Play TTS output
             tts_url = event_data.get("tts_output", {}).get("url")
             if tts_url:
                 url = f"{args.protocol}://{args.host}:{args.port}{tts_url}"
                 playback_queue.put_nowait(PlayMedia(url))
-
+            
+            
         elif event_type in ("run-end", "error"):
             # Start recording for next wake word (after TTS finishes)
             playback_queue.put_nowait(SetMicState(MicState.WAIT_FOR_VAD))
