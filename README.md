@@ -1,5 +1,7 @@
 # Home Assistant Satellite
 
+Fork of Home Assistant satellite for RGB lighting control using Pixels library from https://github.com/respeaker/mic_hat.git
+
 Python-based satellite for [Assist](https://www.home-assistant.io/voice_control/) that streams audio to Home Assistant from a microphone.
 
 You must have the [openWakeWord add-on](https://my.home-assistant.io/redirect/supervisor_addon/?addon=47701997_openwakeword&repository_url=https%3A%2F%2Fgithub.com%2Frhasspy%2Fhassio-addons) installed.
