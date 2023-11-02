@@ -2,7 +2,7 @@
 LED light pattern like Google Home
 """
 
-import apa102
+from .apa102 import apa102
 import time
 import threading
 try:
