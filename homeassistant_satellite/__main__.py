@@ -325,6 +325,7 @@ async def _run_pipeline(
                 playback_queue.put_nowait(PlayMedia(url))
             
         elif event_type in ("run-end", "error"):
+            pixels.off()
             # Start recording for next wake word (after TTS finishes)
             playback_queue.put_nowait(SetMicState(MicState.WAIT_FOR_VAD))
 
