@@ -211,8 +211,6 @@ async def main() -> None:
         args.debug_recording_dir = Path(args.debug_recording_dir)
         args.debug_recording_dir.mkdir(parents=True, exist_ok=True)
 
-    # Load pixels
-    pixels = Pixels()
 
     recording_queue: "asyncio.Queue[Tuple[int, bytes]]" = asyncio.Queue()
     playback_queue: "queue.Queue[PlaybackQueueItem]" = queue.Queue()
@@ -255,7 +253,6 @@ async def main() -> None:
 
     finally:
         state.is_running = False
-        pixels.stop()
         await mic_task
         playback_queue.put_nowait(None)  # exit request
         playback_thread.join()
