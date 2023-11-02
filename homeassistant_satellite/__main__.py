@@ -275,7 +275,7 @@ async def _run_pipeline(
 
     # Initialise Pixels
     pixels = Pixels()
-    pixels.stop()
+    pixels.off()
 
     # The ready_to_stream event fires when local processing is over and we are
     # ready to stream audio to HA.
@@ -314,7 +314,7 @@ async def _run_pipeline(
             if args.done_sound:
                 playback_queue.put_nowait(PlayMedia(args.done_sound))
             # Switch off
-            pixels.stop()
+            pixels.off()
         elif event_type == "tts-end":
             # Speaking
             pixels.speak()
