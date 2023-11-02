@@ -211,6 +211,9 @@ async def main() -> None:
         args.debug_recording_dir = Path(args.debug_recording_dir)
         args.debug_recording_dir.mkdir(parents=True, exist_ok=True)
 
+    # Load pixels
+    pixels = Pixels()
+
     recording_queue: "asyncio.Queue[Tuple[int, bytes]]" = asyncio.Queue()
     playback_queue: "queue.Queue[PlaybackQueueItem]" = queue.Queue()
     ready_to_stream = asyncio.Event()
@@ -252,6 +255,7 @@ async def main() -> None:
 
     finally:
         state.is_running = False
+        pixels.stop()
         await mic_task
         playback_queue.put_nowait(None)  # exit request
         playback_thread.join()
@@ -273,9 +277,8 @@ async def _run_pipeline(
         _LOGGER.debug("Waiting for speech")
 
     # Initialise Pixels
-    
     pixels = Pixels()
-    pixels.off()
+    pixels.listen()
 
     # The ready_to_stream event fires when local processing is over and we are
     # ready to stream audio to HA.
@@ -314,7 +317,7 @@ async def _run_pipeline(
             if args.done_sound:
                 playback_queue.put_nowait(PlayMedia(args.done_sound))
             # Switch off
-            pixels.off()
+            pixels.listen()
         elif event_type == "tts-end":
             # Speaking
             pixels.speak()
@@ -323,7 +326,7 @@ async def _run_pipeline(
             if tts_url:
                 url = f"{args.protocol}://{args.host}:{args.port}{tts_url}"
                 playback_queue.put_nowait(PlayMedia(url))
-            
+            pixels.think()
             
         elif event_type in ("run-end", "error"):
             # Start recording for next wake word (after TTS finishes)
